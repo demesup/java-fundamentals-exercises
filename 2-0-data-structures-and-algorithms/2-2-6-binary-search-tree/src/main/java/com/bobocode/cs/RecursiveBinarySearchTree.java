@@ -1,7 +1,10 @@
 package com.bobocode.cs;
 
 import com.bobocode.util.ExerciseNotCompletedException;
+import lombok.AllArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -18,32 +21,118 @@ import java.util.function.Consumer;
  */
 public class RecursiveBinarySearchTree<T extends Comparable<T>> implements BinarySearchTree<T> {
 
+    @AllArgsConstructor
+    static class Node<T> {
+        T element;
+        Node<T> right;
+        Node<T> left;
+
+        public Node(T element) {
+            this.element = element;
+        }
+
+        public Node(T element, Node<T> right) {
+            this.element = element;
+            this.right = right;
+        }
+    }
+
+    private Node<T> root;
+    private int size = 0;
+
     public static <T extends Comparable<T>> RecursiveBinarySearchTree<T> of(T... elements) {
-        throw new ExerciseNotCompletedException();
+        RecursiveBinarySearchTree<T> tree = new RecursiveBinarySearchTree<>();
+        Arrays.stream(elements).forEach(tree::insert);
+        return tree;
     }
 
     @Override
     public boolean insert(T element) {
-        throw new ExerciseNotCompletedException();
+        return insertElement(Objects.requireNonNull(element));
+    }
+
+    private boolean insertElement(T element) {
+        if (root == null) {
+            root = new Node<>(element);
+            size++;
+            return true;
+        } else {
+            return insertToSubTree(element, root);
+        }
+    }
+
+    private boolean insertToSubTree(T element, Node<T> root) {
+        int compare = element.compareTo(root.element);
+        if (compare < 0) {
+            return insertToLeft(element, root);
+        } else if (compare > 0) {
+            return insertToRight(element, root);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean insertToRight(T element, Node<T> root) {
+        if (root.right == null) {
+            root.right = new Node<>(element);
+            size++;
+            return true;
+        } else return insertToSubTree(element, root.right);
+    }
+
+    private boolean insertToLeft(T element, Node<T> root) {
+        if (root.left == null) {
+            root.left = new Node<>(element);
+            size++;
+            return true;
+        } else return insertToSubTree(element, root.left);
     }
 
     @Override
     public boolean contains(T element) {
-        throw new ExerciseNotCompletedException();
+        return findByElement(Objects.requireNonNull(element), root) != null;
+    }
+
+    private Node<T> findByElement(T element, Node<T> root) {
+        if (root == null) {
+            return null;
+        }
+        int compare = element.compareTo(root.element);
+        if (compare < 0) {
+            return findByElement(element, root.left);
+        } else if (compare > 0) {
+            return findByElement(element, root.right);
+        } else return root;
     }
 
     @Override
     public int size() {
-        throw new ExerciseNotCompletedException();
+        return size;
     }
 
     @Override
     public int depth() {
-        throw new ExerciseNotCompletedException();
+        return root != null ? depth(root) - 1 : 0;
+    }
+
+    private int depth(Node<T> node) {
+        if (node == null) {
+            return 0;
+        } else {
+            return 1 + Math.max(depth(node.left), depth(node.right));
+        }
     }
 
     @Override
     public void inOrderTraversal(Consumer<T> consumer) {
-        throw new ExerciseNotCompletedException();
+        inOrderTraversal(consumer, root);
+    }
+
+    private void inOrderTraversal(Consumer<T> consumer, Node<T> root) {
+        if (root!=null){
+            inOrderTraversal(consumer,root.left);
+            consumer.accept(root.element);
+            inOrderTraversal(consumer,root.right);
+        }
     }
 }
