@@ -291,10 +291,10 @@ public class HashTable<K, V> implements Map<K, V> {
      * @param newCapacity a size of the new underlying array
      */
     public void resizeTable(int newCapacity) {
-        Node<K,V>[] newTable = new Node[validatedCapacity(newCapacity)];
-        Arrays.stream(table).forEach(item->{
+        Node<K, V>[] newTable = new Node[validatedCapacity(newCapacity)];
+        Arrays.stream(table).forEach(item -> {
             var current = item;
-            while (current!= null){
+            while (current != null) {
                 put(newTable, current.key, current.value);
                 current = current.next;
             }
